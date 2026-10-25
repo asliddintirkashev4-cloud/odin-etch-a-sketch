@@ -71,14 +71,29 @@ grid.addEventListener('keydown', event => {
   if (event.key === 'ArrowUp') setActive(Math.max(0,activeIndex-size));
   if (event.key === ' ' || event.key === 'Enter') paint(grid.children[activeIndex]);
 });
+const sizeDialog = document.createElement('dialog');
+sizeDialog.setAttribute('aria-labelledby', 'grid-dialog-title');
+sizeDialog.innerHTML = `<form id="grid-size-form"><h2 id="grid-dialog-title">Resize drawing grid</h2><p>Enter a whole number from 1 to 100. Resizing clears the canvas.</p><label for="new-grid-size">Squares per side</label><input id="new-grid-size" inputmode="numeric" autocomplete="off"><p id="grid-size-error" role="alert"></p><button type="submit">Create grid</button> <button type="button" id="cancel-grid-size">Cancel</button></form>`;
+document.body.appendChild(sizeDialog);
+const dialogSize = sizeDialog.querySelector('#new-grid-size');
+const dialogError = sizeDialog.querySelector('#grid-size-error');
 document.querySelector('#resize').addEventListener('click', () => {
-  const answer = prompt('Squares per side? Enter a whole number from 1 to 100.',sizeField.value);
-  if (answer === null) return;
-  const next = parseGridSize(answer);
-  if (next === null) { message.textContent='Use a whole number between 1 and 100. Your drawing is unchanged.'; return; }
-  createGrid(next);
-  message.textContent=`New ${size} by ${size} grid created.`;
+  dialogSize.value = sizeField.value;
+  dialogError.textContent = '';
+  sizeDialog.showModal();
+  dialogSize.focus();
+  dialogSize.select();
 });
+sizeDialog.querySelector('#grid-size-form').addEventListener('submit', event => {
+  event.preventDefault();
+  const next = parseGridSize(dialogSize.value);
+  if (next === null) { dialogError.textContent = 'Use a whole number between 1 and 100. Your drawing is unchanged.'; return; }
+  createGrid(next);
+  message.textContent = `New ${size} by ${size} grid created.`;
+  sizeDialog.close();
+});
+sizeDialog.querySelector('#cancel-grid-size').addEventListener('click', () => { sizeField.value = size; sizeDialog.close(); });
+sizeDialog.addEventListener('cancel', () => { sizeField.value = size; });
 document.querySelector('#clear').addEventListener('click', () => { createGrid(size);message.textContent='Canvas cleared.'; });
 sizeField.addEventListener('change', () => {
   const next = parseGridSize(sizeField.value);
