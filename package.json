@@ -1,0 +1,9 @@
+{
+  "name": "odin-etch-a-sketch",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Etch-a-Sketch - The Odin Project Foundations",
+  "scripts": {
+    "test": "node --test grid.test.cjs"
+  }
+}
